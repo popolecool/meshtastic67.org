@@ -3,7 +3,7 @@
 ![screenshot](readme-image.png)
 
 ## Description
-Thi static website page aims at promoting Meshtastic community in Alsace.
+This static website page aims at promoting Meshtastic community in Alsace.
 You can join our Discord using this link :
 <a href="https://discord.gg/aRYWN5HwFU">Discord</a>
 
