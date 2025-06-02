@@ -12,6 +12,8 @@
     "@astrojs/node": "^9.2.1",
     "@tailwindcss/vite": "^4.1.4",
     "astro": "^5.7.5",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
     "tailwindcss": "^4.1.4"
   }
 }

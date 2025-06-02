@@ -1,0 +1,212 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+interface Entry {
+  id: number;
+  name: string;
+  message: string;
+  timestamp: string; // Assuming timestamp is a string like 'YYYY-MM-DD HH:MM:SS'
+}
+
+let entries: Entry[] = [];
+let error: string | null = null;
+
+// This script runs on the server during the build or SSR.
+// For initial data fetching, it's better to do it client-side for a dynamic guestbook
+// unless this is a purely static site and entries are pre-rendered.
+// Given the requirements (fetch and re-render), client-side fetching is primary.
+---
+
+<Layout title="Guestbook">
+  <div class="container mx-auto p-4 max-w-2xl">
+    <h1 class="text-3xl font-bold mb-6 text-center">Guestbook</h1>
+
+    <form id="guestbookForm" class="mb-8 p-6 bg-white shadow-md rounded-lg">
+      <div class="mb-4">
+        <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
+        <input type="text" id="name" name="name" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Your Name">
+      </div>
+
+      <div class="mb-4">
+        <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
+        <input type="email" id="email" name="email" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="your@email.com (not displayed)">
+      </div>
+
+      <div class="mb-4"> <!-- Consistent margin with other form fields -->
+        <label for="message" class="block text-gray-700 text-sm font-bold mb-2">Message:</label>
+        <textarea id="message" name="message" rows="4" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Leave your message"></textarea>
+      </div>
+
+      <div class="flex items-center justify-end"> <!-- Align button to the right -->
+        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+          Sign Guestbook
+        </button>
+      </div>
+      <div id="formStatus" class="mt-4 text-sm"></div> <!-- Styling handled by JS -->
+    </form>
+
+    <h2 class="text-2xl font-semibold mb-4 mt-8">Entries</h2> <!-- Added mt-8 for more separation -->
+    <div id="entriesList" class="space-y-4">
+      <!-- Entries will be rendered here by client-side script -->
+      <p id="loadingEntries" class="text-blue-500 p-4 text-center">Loading entries...</p>
+      <p id="errorEntries" class="text-red-600 bg-red-100 border border-red-400 p-3 rounded-md hidden"></p>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('guestbookForm') as HTMLFormElement;
+    const formStatus = document.getElementById('formStatus');
+    const entriesList = document.getElementById('entriesList');
+    const loadingEntries = document.getElementById('loadingEntries');
+    const errorEntries = document.getElementById('errorEntries');
+
+    function displayFormStatus(message: string, isError: boolean) {
+      if (!formStatus) return;
+      formStatus.textContent = message;
+      if (message) {
+        formStatus.className = `mt-4 text-sm p-3 rounded-md ${isError ? 'text-red-700 bg-red-100 border border-red-400' : 'text-green-700 bg-green-100 border border-green-400'}`;
+        formStatus.classList.remove('hidden');
+      } else {
+        formStatus.className = 'mt-4 text-sm hidden'; // Keep base and hide
+        formStatus.classList.add('hidden');
+      }
+    }
+
+    function formatTimestamp(isoString: string): string {
+      if (!isoString) return 'Just now';
+      try {
+        return new Date(isoString).toLocaleString();
+      } catch (e) {
+        return isoString; // fallback if parsing fails
+      }
+    }
+
+    async function fetchEntries() {
+      if(loadingEntries) loadingEntries.classList.remove('hidden');
+      if(errorEntries) errorEntries.classList.add('hidden');
+
+      try {
+        const response = await fetch('/api/entries');
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Failed to fetch entries and parse error.' }));
+          throw new Error(errorData.error || `HTTP error ${response.status}`);
+        }
+        const data = await response.json();
+
+        if (data.success && Array.isArray(data.entries)) {
+          renderEntries(data.entries);
+        } else {
+          throw new Error(data.error || 'Received invalid data from server.');
+        }
+      } catch (err) {
+        console.error('Fetch error:', err);
+        if(errorEntries) {
+            errorEntries.textContent = `Error loading entries: ${err.message || 'Unknown error'}`;
+            errorEntries.classList.remove('hidden');
+        }
+      } finally {
+        if(loadingEntries) loadingEntries.classList.add('hidden');
+      }
+    }
+
+    function renderEntries(entries: Array<{ id: number; name: string; message: string; timestamp: string }>) {
+      if (!entriesList) return;
+
+      // Remove only entry items, not permanent elements like loading/error messages
+      const existingEntryElements = entriesList.querySelectorAll('.entry-item');
+      existingEntryElements.forEach(el => el.remove());
+
+      // Ensure loading/error messages are handled correctly before rendering new content
+      if(loadingEntries) loadingEntries.classList.add('hidden');
+      if(errorEntries) errorEntries.classList.add('hidden');
+
+      if (entries.length === 0) {
+        const noEntriesMessage = document.createElement('p');
+        noEntriesMessage.textContent = 'No entries yet. Be the first to sign!';
+        // Added some padding and centering for the "no entries" message
+        noEntriesMessage.className = 'text-gray-500 entry-item text-center py-4';
+        entriesList.appendChild(noEntriesMessage);
+      } else {
+        entries.forEach(entry => {
+          const entryDiv = document.createElement('div');
+          // Slightly increased padding and shadow for better separation of entries
+          entryDiv.className = 'entry-item p-5 bg-white border border-gray-200 rounded-lg shadow-md';
+
+          const header = document.createElement('div');
+          header.className = 'flex justify-between items-center mb-2';
+
+          const nameEl = document.createElement('strong');
+          nameEl.className = 'text-lg font-semibold text-gray-900'; // Darker name for emphasis
+          nameEl.textContent = entry.name;
+
+          const timeEl = document.createElement('span');
+          timeEl.className = 'text-xs text-gray-500'; // Timestamp style is fine
+          timeEl.textContent = formatTimestamp(entry.timestamp);
+
+          header.appendChild(nameEl);
+          header.appendChild(timeEl);
+
+          const messageEl = document.createElement('p');
+          messageEl.className = 'text-gray-700 whitespace-pre-wrap mt-1'; // Added mt-1 for a bit of space from header
+          messageEl.textContent = entry.message;
+
+          entryDiv.appendChild(header);
+          entryDiv.appendChild(messageEl);
+          entriesList.appendChild(entryDiv);
+        });
+      }
+      // No need to hide loading/error here again as it's handled at the start of render and in fetchEntries
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      displayFormStatus('', false); // Clear previous status by hiding it
+
+      const nameInput = form.elements.namedItem('name') as HTMLInputElement;
+      const emailInput = form.elements.namedItem('email') as HTMLInputElement;
+      const messageInput = form.elements.namedItem('message') as HTMLTextAreaElement;
+
+      const name = nameInput.value.trim();
+      const email = emailInput.value.trim();
+      const message = messageInput.value.trim();
+
+      if (!name || !email || !message) {
+        displayFormStatus('All fields are required.', true);
+        return;
+      }
+      // Basic email validation (more robust validation is on the server)
+      if (!email.includes('@') || !email.includes('.')) {
+         displayFormStatus('Please enter a valid email address.', true);
+         return;
+      }
+
+      try {
+        const response = await fetch('/api/entries', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name, email, message }),
+        });
+
+        const result = await response.json();
+
+        if (response.status === 201 && result.success) {
+          displayFormStatus('Entry added successfully!', false);
+          form.reset();
+          fetchEntries(); // Refresh the list
+        } else {
+          displayFormStatus(result.error || `Error: ${response.statusText}`, true);
+        }
+      } catch (err) {
+        console.error('Submit error:', err);
+        displayFormStatus('An unexpected error occurred. Please try again.', true);
+      }
+    });
+
+    // Initial load of entries
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchEntries();
+    });
+  </script>
+</Layout>
