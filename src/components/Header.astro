@@ -1,17 +1,19 @@
 ---
 import { Image } from 'astro:assets'
 import alsace_blason from "../images/alsace_blason.png"
+import meshtastic_logo from "../images/meshtastic_logo.svg"
 ---
-<header class="mx-auto w-[95%] max-w-[984px] h-[70px] bg-gray-100 flex items-center justify-center">
-    <div class="h-[90%] flex items-center py-2 bg-white w-full mt-12 rounded-full border border-[#00758e] justify-start px-8">
+<header class="mx-auto w-[95%] max-w-[984px] h-[70px] bg-[#9fcbd4] flex items-center justify-center">
+    <div class="h-[90%] flex items-center py-2 bg-[#9fcbd4] w-full mt-12 rounded-full border border-[#00758e] justify-start px-8">
         <div class="h-full flex items-center w-full">
-            <Image src={alsace_blason} alt="" class="h-3/4 max-sm:h-1/2 max-xl:h-3/5 w-auto" decoding="async" loading="lazy" width="75" height="75" />
-            <h1 class="font-title text-5xl max-xl:text-4xl max-sm:text-2xl text-[#00758e]">MESHTASTIC67</h1>
+            <Image src={alsace_blason} alt="" class="h-3/4 max-sm:h-1/2 max-xl:h-3/5 w-auto mr-2" decoding="async" loading="lazy" width="75" height="75" />
+            <Image src={meshtastic_logo} alt="" class="h-3/4 max-sm:h-1/2 max-xl:h-3/5 w-auto mr-2 text-[#00758e] " decoding="async" loading="lazy" width="75" height="75" />
+            <h1 class="font-title text-5xl max-xl:text-4xl max-sm:text-2xl text-[#00758e]">67</h1>
         </div>
         <ul class="flex gap-10 ml-16 max-sm:hidden">
             <a href="/"><li>Accueil</li></a>
             <a href="/equipment"><li>Matériel</li></a>
-            <a href="/guestbook"><li>Guestbook</li></a>
+            <a href="/guestbook"><li>Livre d'or</li></a>
         </ul>
         <button id="toggleOpen" class="sm:hidden cursor-pointer" type="button" data-popover-target="menu" onclick="toggleMenu()">
             <svg id="menu-cross" class="w-7 h-7" fill="#000" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -22,7 +24,7 @@ import alsace_blason from "../images/alsace_blason.png"
               <path d="M1,1 9,9 M9,1 1,9"></path>
             </svg>
         </button>
-        <ul id="menu" role="menu" data-popover="menu" data-popover-placement="bottom" class="absolute z-10 min-w-[180px] w-full overflow-auto bg-main-black text-gray-700 p-1.5 shadow-lg border-b border-[#00758e] focus:outline-none top-[100px] right-0 sm:hidden bg-white hidden">
+        <ul id="menu" role="menu" data-popover="menu" data-popover-placement="bottom" class="absolute z-10 min-w-[180px] w-full overflow-auto bg-main-black text-gray-700 p-1.5 shadow-lg border-b border-[#00758e] focus:outline-none top-[100px] right-0 sm:hidden bg-[#9fcbd4] hidden">
             <a href="/">
               <li role="menuitem" class="cursor-pointer text-gray-700 flex w-full text-sm items-center rounded-md p-3 transition-all hover:text-gray-700 focus:text-gray-700 active:text-gray-700 hover:bg-main-green focus:bg-main-green active:bg-main-green">
                 Accueil

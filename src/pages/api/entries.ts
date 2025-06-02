@@ -2,6 +2,8 @@ import type { APIRoute } from 'astro';
 import sqlite3 from 'sqlite3';
 import { open } from 'sqlite';
 
+export const prerender = false;
+
 const dbPath = './data/guestbook.db'; // Adjusted path to be relative to the project root
 
 // Function to open the database connection

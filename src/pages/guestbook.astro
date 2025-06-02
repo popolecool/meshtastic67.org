@@ -19,7 +19,7 @@ let error: string | null = null;
 
 <Layout title="Guestbook">
   <div class="container mx-auto p-4 max-w-2xl">
-    <h1 class="text-3xl font-bold mb-6 text-center">Guestbook</h1>
+    <h1 class="text-3xl font-bold mb-6 text-center">Livre d'or</h1>
 
     <form id="guestbookForm" class="mb-8 p-6 bg-white shadow-md rounded-lg">
       <div class="mb-4">
@@ -39,7 +39,7 @@ let error: string | null = null;
 
       <div class="flex items-center justify-end"> <!-- Align button to the right -->
         <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-          Sign Guestbook
+          enregister Livre d'or
         </button>
       </div>
       <div id="formStatus" class="mt-4 text-sm"></div> <!-- Styling handled by JS -->
@@ -67,7 +67,7 @@ let error: string | null = null;
         formStatus.className = `mt-4 text-sm p-3 rounded-md ${isError ? 'text-red-700 bg-red-100 border border-red-400' : 'text-green-700 bg-green-100 border border-green-400'}`;
         formStatus.classList.remove('hidden');
       } else {
-        formStatus.className = 'mt-4 text-sm hidden'; // Keep base and hide
+        formStatus.className = 'mt-4 text-sm hidden';
         formStatus.classList.add('hidden');
       }
     }
@@ -77,7 +77,7 @@ let error: string | null = null;
       try {
         return new Date(isoString).toLocaleString();
       } catch (e) {
-        return isoString; // fallback if parsing fails
+        return isoString; 
       }
     }
 
@@ -112,31 +112,27 @@ let error: string | null = null;
     function renderEntries(entries: Array<{ id: number; name: string; message: string; timestamp: string }>) {
       if (!entriesList) return;
 
-      // Remove only entry items, not permanent elements like loading/error messages
       const existingEntryElements = entriesList.querySelectorAll('.entry-item');
       existingEntryElements.forEach(el => el.remove());
 
-      // Ensure loading/error messages are handled correctly before rendering new content
       if(loadingEntries) loadingEntries.classList.add('hidden');
       if(errorEntries) errorEntries.classList.add('hidden');
 
       if (entries.length === 0) {
         const noEntriesMessage = document.createElement('p');
         noEntriesMessage.textContent = 'No entries yet. Be the first to sign!';
-        // Added some padding and centering for the "no entries" message
         noEntriesMessage.className = 'text-gray-500 entry-item text-center py-4';
         entriesList.appendChild(noEntriesMessage);
       } else {
         entries.forEach(entry => {
           const entryDiv = document.createElement('div');
-          // Slightly increased padding and shadow for better separation of entries
           entryDiv.className = 'entry-item p-5 bg-white border border-gray-200 rounded-lg shadow-md';
 
           const header = document.createElement('div');
           header.className = 'flex justify-between items-center mb-2';
 
           const nameEl = document.createElement('strong');
-          nameEl.className = 'text-lg font-semibold text-gray-900'; // Darker name for emphasis
+          nameEl.className = 'text-lg font-semibold text-gray-900'; 
           nameEl.textContent = entry.name;
 
           const timeEl = document.createElement('span');
@@ -147,7 +143,7 @@ let error: string | null = null;
           header.appendChild(timeEl);
 
           const messageEl = document.createElement('p');
-          messageEl.className = 'text-gray-700 whitespace-pre-wrap mt-1'; // Added mt-1 for a bit of space from header
+          messageEl.className = 'text-gray-700 whitespace-pre-wrap mt-1'; 
           messageEl.textContent = entry.message;
 
           entryDiv.appendChild(header);
@@ -155,12 +151,11 @@ let error: string | null = null;
           entriesList.appendChild(entryDiv);
         });
       }
-      // No need to hide loading/error here again as it's handled at the start of render and in fetchEntries
     }
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
-      displayFormStatus('', false); // Clear previous status by hiding it
+      displayFormStatus('', false); 
 
       const nameInput = form.elements.namedItem('name') as HTMLInputElement;
       const emailInput = form.elements.namedItem('email') as HTMLInputElement;
@@ -174,7 +169,6 @@ let error: string | null = null;
         displayFormStatus('All fields are required.', true);
         return;
       }
-      // Basic email validation (more robust validation is on the server)
       if (!email.includes('@') || !email.includes('.')) {
          displayFormStatus('Please enter a valid email address.', true);
          return;
@@ -194,7 +188,7 @@ let error: string | null = null;
         if (response.status === 201 && result.success) {
           displayFormStatus('Entry added successfully!', false);
           form.reset();
-          fetchEntries(); // Refresh the list
+          fetchEntries(); 
         } else {
           displayFormStatus(result.error || `Error: ${response.statusText}`, true);
         }
@@ -204,7 +198,6 @@ let error: string | null = null;
       }
     });
 
-    // Initial load of entries
     document.addEventListener('DOMContentLoaded', () => {
         fetchEntries();
     });
