@@ -4,7 +4,7 @@ import path from 'path';
 
 export const prerender = false;
 
-const jsonPath = path.resolve(process.cwd(), 'data', 'guestbook.json');
+const jsonPath = path.resolve(process.cwd(), 'src', 'data', 'guestbook.json');
 
 async function readEntries() {
   try {
