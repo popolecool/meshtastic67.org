@@ -1,6 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
-
+import Header from '../components/Header.astro';
+import Footer from "../components/Footer.astro"
+import Guestbook from "../components/Guestbook.astro"
 interface Entry {
   id: number;
   name: string;
@@ -18,40 +20,8 @@ let error: string | null = null;
 ---
 
 <Layout title="Guestbook">
-  <div class="container mx-auto p-4 max-w-2xl">
-    <h1 class="text-3xl font-bold mb-6 text-center">Livre d'or</h1>
-
-    <form id="guestbookForm" class="mb-8 p-6 bg-white shadow-md rounded-lg">
-      <div class="mb-4">
-        <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
-        <input type="text" id="name" name="name" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Your Name">
-      </div>
-
-      <div class="mb-4">
-        <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
-        <input type="email" id="email" name="email" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="your@email.com (not displayed)">
-      </div>
-
-      <div class="mb-4"> <!-- Consistent margin with other form fields -->
-        <label for="message" class="block text-gray-700 text-sm font-bold mb-2">Message:</label>
-        <textarea id="message" name="message" rows="4" required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Leave your message"></textarea>
-      </div>
-
-      <div class="flex items-center justify-end"> <!-- Align button to the right -->
-        <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-          enregister Livre d'or
-        </button>
-      </div>
-      <div id="formStatus" class="mt-4 text-sm"></div> <!-- Styling handled by JS -->
-    </form>
-
-    <h2 class="text-2xl font-semibold mb-4 mt-8">Entries</h2> <!-- Added mt-8 for more separation -->
-    <div id="entriesList" class="space-y-4">
-      <!-- Entries will be rendered here by client-side script -->
-      <p id="loadingEntries" class="text-blue-500 p-4 text-center">Loading entries...</p>
-      <p id="errorEntries" class="text-red-600 bg-red-100 border border-red-400 p-3 rounded-md hidden"></p>
-    </div>
-  </div>
+  <Header />
+  <Guestbook />
 
   <script>
     const form = document.getElementById('guestbookForm') as HTMLFormElement;
@@ -201,5 +171,6 @@ let error: string | null = null;
     document.addEventListener('DOMContentLoaded', () => {
         fetchEntries();
     });
-  </script>
+  </script>	
+  <Footer />
 </Layout>
